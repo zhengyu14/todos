@@ -1,0 +1,19 @@
+{
+  "name": "to_do_list",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "to_do_list"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "hapi": "^17.1.1",
+    "mongodb": "^3.0.0-rc0"
+  }
+}
