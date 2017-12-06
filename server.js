@@ -1,6 +1,5 @@
 'use strict';
 
-const uuidv1 = require('uuid/v1');
 const Hapi = require('hapi');
 var MongoClient = require('mongodb').MongoClient
  , assert = require('assert');
@@ -55,6 +54,7 @@ server.route({
       database.collection("todos").find({}).toArray(function(err, r) {
         assert.equal(null, err);
         console.log(r);
+        response = r;
       });
     });
     return response;
