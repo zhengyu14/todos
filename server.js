@@ -1,67 +1,74 @@
 'use strict';
 
 const Hapi = require('hapi');
-
-// Create a server with a host and port
-const server = Hapi.server({
-    host: 'localhost',
-    port: 3000
-});
-
 var MongoClient = require('mongodb').MongoClient
  , assert = require('assert');
 
- // Connection URL
-var url = 'mongodb://localhost:27017/test';
+// Create a server with a host and port
+const server = Hapi.server({
+  host: 'localhost',
+  port: 3000
+ });
 
-// Use connect method to connect to the server
-MongoClient.connect(url, function(err, db) {
-  assert.equal(null, err);
-  console.log("Connected successfully to MongoDB server at: ", url);
+// Connection URL
+const url = 'mongodb://localhost:27017/test';
+const statusNew = 'NEW';
+const statusCompleted = 'COMPLETED';
 
-  var todoCollection = db.collection('documents');
+// Create a new todo item
+server.route({
+  method: 'POST',
+  path:'/create/{title}',
+  handler: function (request, reply) {
 
-  // Create a new todo item
-  server.route({
-      method: 'POST',
-      path:'/create',
-      handler: function (request, reply) {
-          // Insert a single document
-          db.todoCollection('inserts').insertOne({a:1}, function(err, r) {
-            assert.equal(null, err);
-            assert.equal(1, r.insertedCount);
-
-            db.cloase();
-          });
+    // Use connect method to connect to the server
+    MongoClient.connect(url, function(err, db) {
+      assert.equal(null, err);
+      var database = db.db("todos");
+      var newTodo = {
+        name:encodeURIComponent(request.params.title),
+        status:'NEW'
       }
-  });
+      // Insert a single document
+      database.collection("todos").insertOne(newTodo, function(err, r) {
+        assert.equal(null, err);
+        assert.equal(1, r.insertedCount);
+      });
+    });
 
-  // Get a list of todos
-  server.route({
-      method: 'GET',
-      path:'/showall',
-      handler: function (request, reply) {
-          // Find all documents
-          db.collection('find').find({}).toArray(function(err, docs) {
-            assert.equal(null, err);
-            db.close();
-          })
-          return 'hello world';
-      }
-  });
-
-  db.close();
+    return "ok";
+  }
 });
 
-
+// Get a list of todos
+server.route({
+    method: 'GET',
+    path:'/findall',
+    handler: function (request, reply) {
+      var result;
+      MongoClient.connect(url, function(err, db) {
+        assert.equal(null, err);
+        var database = db.db("todos");
+        // Insert a single document
+        database.collection("todos").find({}).toArray(function(err, r) {
+          assert.equal(null, err);
+          result = r;
+        });
+      });
+      return result;
+    }
+});
 
 // Delete a completed todo item
 server.route({
     method: 'DELETE',
     path:'/delete/{id}',
     handler: function (request, reply) {
-
-        return 'hello world';
+        var myquery = { _id: encodeURIComponent(request.params.id)}
+        db.collection.deleteOne(myquery, function(err, r) {
+            assert.equal(null, err);
+            assert.equal(1, r.deletedCount);
+          });
     }
 });
 
@@ -84,6 +91,8 @@ server.route({
         return 'hello world';
     }
 });
+
+
 
 // Start the server
 async function start() {

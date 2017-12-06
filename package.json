@@ -2,7 +2,7 @@
   "name": "to_do_list",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -13,7 +13,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "boom": "^7.1.1",
     "hapi": "^17.1.1",
-    "mongodb": "^3.0.0-rc0"
+    "joi": "^13.0.2",
+    "mongodb": "^3.0.0-rc0",
+    "mongojs": "^2.4.1",
+    "node-uuid": "^1.4.8"
   }
 }
