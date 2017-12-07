@@ -43,14 +43,14 @@ MongoClient.connect(url, function(err, db) {
   server.route({
     method: 'GET',
     path:'/read',
-    handler: function (request, reply) {
+    async handler(request, reply) {
+      var response;
 
-      database.collection("todos").find({}).toArray(function(err, r) {
+    await database.collection("todos").find({}).toArray(function(err, r) {
         assert.equal(null, err);
+        console.log(r);;
       });
-
-      var response = r;
-      return response;
+      return "Please find all to-do items in console.";
     }
   });
 
@@ -104,10 +104,36 @@ MongoClient.connect(url, function(err, db) {
   // Search for a to-do item
   server.route({
       method: 'GET',
-      path:'/search',
+      path:'/query',
       handler: function (request, reply) {
+        var queryTarget
+        if (request.query.title) {
+          queryTarget ={
+            title: encodeURIComponent(request.query.title)
+          }
+        } else if (request.query.status) {
+          queryTarget ={
+            status: encodeURIComponent(request.query.status)
+          }
+        } else if (request.query.title && request.query.status) {
+          queryTarget ={
+            title: encodeURIComponent(request.query.title)
+            , status: encodeURIComponent(request.query.status)
+          }
+        }
 
-          return 'hello world';
+        if (queryTarget) {
+          database.collection("todos").find(queryTarget).toArray(function(err, r) {
+            assert.equal(null, err);
+            console.log(r);
+            return r;
+          })
+
+          return "Please find the query results in console.";
+        } else {
+          return "No hit."
+        }
+
       }
   });
 
